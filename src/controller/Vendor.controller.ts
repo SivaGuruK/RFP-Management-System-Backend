@@ -76,7 +76,7 @@ class VendorController {
 
 
   // Get vendor by ID
-  
+
   async getVendorById(req: Request, res: Response) {
     try {
       const vendor = await VendorModel.findById(req.params.id);
@@ -97,6 +97,79 @@ class VendorController {
       res.status(500).json({
         success: false,
         message: 'Failed to fetch vendor'
+      });
+    }
+  }
+    //Update vendor
+
+  async updateVendor(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+
+      if (email) {
+        const existingVendor = await VendorModel.findOne({ 
+          email, 
+          _id: { $ne: req.params.id } 
+        });
+        
+        if (existingVendor) {
+          return res.status(400).json({
+            success: false,
+            message: 'Email already in use by another vendor'
+          });
+        }
+      }
+
+      const vendor = await VendorModel.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true, runValidators: true }
+      );
+
+      if (!vendor) {
+        return res.status(404).json({
+          success: false,
+          message: 'Vendor not found'
+        });
+      }
+
+      logger.info(`Vendor updated: ${vendor._id}`);
+      res.status(200).json({
+        success: true,
+        data: vendor
+      });
+    } catch (error) {
+      logger.error('Error in updateVendor:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update vendor'
+      });
+    }
+  }
+
+  // Delete vendor
+
+  async deleteVendor(req: Request, res: Response) {
+    try {
+      const vendor = await VendorModel.findByIdAndDelete(req.params.id);
+
+      if (!vendor) {
+        return res.status(404).json({
+          success: false,
+          message: 'Vendor not found'
+        });
+      }
+
+      logger.info(`Vendor deleted: ${req.params.id}`);
+      res.status(200).json({
+        success: true,
+        message: 'Vendor deleted successfully'
+      });
+    } catch (error) {
+      logger.error('Error in deleteVendor:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to delete vendor'
       });
     }
   }
