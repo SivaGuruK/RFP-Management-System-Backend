@@ -19,3 +19,15 @@ export interface IRFP extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface IVendor extends Document {
+  name: string;
+  email: string;
+  phone: string;
+  contactPerson?: string;
+  rfpsSent: number;
+  responsesReceived: number;
+  responseRate: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
