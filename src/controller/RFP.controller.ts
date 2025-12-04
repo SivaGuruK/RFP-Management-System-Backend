@@ -36,7 +36,7 @@ class RFPController {
   }
 
   //CREATE RFP
-  
+
     async createRFP(req: Request, res: Response) {
     try {
       const rfp = new rfpModel(req.body);
@@ -56,6 +56,32 @@ class RFPController {
     }
   }
 
+  // GET All RFPs
+    async getAllRFPs(req: Request, res: Response) {
+    try {
+      const { status } = req.query;
+      
+      const filter: any = {};
+      if (status) {
+        filter.status = status;
+      }
+
+      const rfps = await rfpModel.find(filter)
+        .sort({ createdAt: -1 });
+
+      res.status(200).json({
+        success: true,
+        count: rfps.length,
+        data: rfps
+      });
+    } catch (error) {
+      logger.error('Error in getAllRFPs:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to fetch RFPs' 
+      });
+    }
+  }
 }
 
 export default new RFPController();
