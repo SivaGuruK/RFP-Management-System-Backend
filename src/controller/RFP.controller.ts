@@ -87,7 +87,7 @@ class RFPController {
   async getRFPById(req: Request, res: Response) {
     try {
       const rfp = await rfpModel.findById(req.params.id)
-      
+
       if (!rfp) {
         return res.status(404).json({ 
           success: false, 
@@ -104,6 +104,36 @@ class RFPController {
       res.status(500).json({ 
         success: false, 
         message: 'Failed to fetch RFP' 
+      });
+    }
+  }
+
+  //UPDATE RFPs BY ID
+  async updateRFP(req: Request, res: Response) {
+    try {
+      const rfp = await rfpModel.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true, runValidators: true }
+      );
+
+      if (!rfp) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'RFP not found' 
+        });
+      }
+
+      logger.info(`RFP updated: ${rfp._id}`);
+      res.status(200).json({
+        success: true,
+        data: rfp
+      });
+    } catch (error) {
+      logger.error('Error in updateRFP:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to update RFP' 
       });
     }
   }

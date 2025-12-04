@@ -7,5 +7,6 @@ router.post('/generate-rfp', rfpController.generateRFP);
 router.post('/create-rfp', rfpController.createRFP);
 router.get('/',rfpController.getAllRFPs)
 router.get('/:id',rfpController.getRFPById)
+router.put('/:id',rfpController.updateRFP)
 
 export default router
