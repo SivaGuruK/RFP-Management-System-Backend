@@ -1,4 +1,5 @@
 import { Document } from 'mongoose';
+import { Types } from "mongoose";
 
 export interface IItem {
   name: string;
@@ -30,4 +31,20 @@ export interface IVendor extends Document {
   responseRate: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IEmail extends Document {
+  rfpId: Types.ObjectId;
+  vendorId?: Types.ObjectId;
+  from: string;
+  to: string;
+  subject: string;
+  body: string;
+  attachments?: string[];
+  direction: 'inbound' | 'outbound';
+  status: 'sent' | 'received' | 'parsed' | 'failed';
+  parsedProposalId?: string;
+  receivedAt?: Date;
+  sentAt?: Date;
+  createdAt: Date;
 }
