@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import aiService from '@/services/ai.service';
 import logger from '@/utils/logger';
+import rfpModel from '@/models/RFP.model';
 
 class RFPController {
+  //Generate RFP
+
   async generateRFP(req: Request, res: Response) {
     try {
       const { description } = req.body;
@@ -31,6 +34,28 @@ class RFPController {
       });
     }
   }
+
+  //CREATE RFP
+  
+    async createRFP(req: Request, res: Response) {
+    try {
+      const rfp = new rfpModel(req.body);
+      await rfp.save();
+
+      logger.info(`RFP created: ${rfp._id}`);
+      res.status(201).json({
+        success: true,
+        data: rfp
+      });
+    } catch (error) {
+      logger.error('Error in createRFP:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to create RFP' 
+      });
+    }
+  }
+
 }
 
 export default new RFPController();
