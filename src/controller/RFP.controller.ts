@@ -137,6 +137,61 @@ class RFPController {
       });
     }
   }
+
+  //DELETE RFPs By ID
+    async deleteRFP(req: Request, res: Response) {
+    try {
+      const rfp = await rfpModel.findByIdAndDelete(req.params.id);
+
+      if (!rfp) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'RFP not found' 
+        });
+      }
+
+      logger.info(`RFP deleted: ${req.params.id}`);
+      res.status(200).json({
+        success: true,
+        message: 'RFP deleted successfully'
+      });
+    } catch (error) {
+      logger.error('Error in deleteRFP:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to delete RFP' 
+      });
+    }
+  }
+
+  //Get dashboard stats
+  async getDashboardStats(req: Request, res: Response) {
+    try {
+      const totalRFPs = await rfpModel.countDocuments();
+      const draftRFPs = await rfpModel.countDocuments({ status: 'draft' });
+      const sentRFPs = await rfpModel.countDocuments({ status: 'sent' });
+      const responsesRFPs = await rfpModel.countDocuments({ status: 'responses' });
+      const evaluatedRFPs = await rfpModel.countDocuments({ status: 'evaluated' });
+
+      res.status(200).json({
+        success: true,
+        data: {
+          total: totalRFPs,
+          draft: draftRFPs,
+          sent: sentRFPs,
+          responses: responsesRFPs,
+          evaluated: evaluatedRFPs
+        }
+      });
+    } catch (error) {
+      logger.error('Error in getDashboardStats:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to fetch dashboard stats' 
+      });
+    }
+  }
+
 }
 
 export default new RFPController();
