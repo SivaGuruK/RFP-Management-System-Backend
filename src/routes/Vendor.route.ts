@@ -7,5 +7,6 @@ router.get('/',vendorController.getAllVendors)
 router.get('/:id',vendorController.getVendorById)
 router.put('/:id',vendorController.updateVendor)
 router.delete('/:id',vendorController.deleteVendor)
+router.put('/:id/stats', vendorController.updateVendorStats);
 
 export default router
