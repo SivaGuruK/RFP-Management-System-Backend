@@ -82,6 +82,31 @@ class RFPController {
       });
     }
   }
+
+  //GET RFPs BY ID
+  async getRFPById(req: Request, res: Response) {
+    try {
+      const rfp = await rfpModel.findById(req.params.id)
+      
+      if (!rfp) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'RFP not found' 
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: rfp
+      });
+    } catch (error) {
+      logger.error('Error in getRFPById:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to fetch RFP' 
+      });
+    }
+  }
 }
 
 export default new RFPController();
