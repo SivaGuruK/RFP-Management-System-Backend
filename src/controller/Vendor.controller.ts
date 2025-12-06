@@ -173,38 +173,6 @@ class VendorController {
       });
     }
   }
-
-  //Update Vendor Stats
-  
-  async updateVendorStats(req: Request, res: Response) {
-    try {
-      const { rfpsSent, responsesReceived } = req.body;
-      
-      const vendor = await VendorModel.findById(req.params.id);
-      
-      if (!vendor) {
-        return res.status(404).json({
-          success: false,
-          message: 'Vendor not found'
-        });
-      }
-
-      if (rfpsSent !== undefined) vendor.rfpsSent = rfpsSent;
-      if (responsesReceived !== undefined) vendor.responsesReceived = responsesReceived;
-
-      await vendor.save(); 
-      res.status(200).json({
-        success: true,
-        data: vendor
-      });
-    } catch (error) {
-      logger.error('Error in updateVendorStats:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to update vendor stats'
-      });
-    }
-}
 }
 
 export default new VendorController();
