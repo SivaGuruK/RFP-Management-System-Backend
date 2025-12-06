@@ -3,7 +3,7 @@ import app from '@/app';
 import { connectDB } from '@/database/connect';
 import logger from '@/utils/logger';
 import http from "http";
-import emailCron from "@/cron/emailpoller.cron";
+import emailCron from "@/cron/emailPoller.cron";
 
 const server = http.createServer(app);
 
