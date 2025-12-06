@@ -1,0 +1,197 @@
+import { Request, Response } from 'express';
+import aiService from '@/services/ai.service';
+import logger from '@/utils/logger';
+import rfpModel from '@/models/RFP.model';
+
+class RFPController {
+  //Generate RFP
+
+  async generateRFP(req: Request, res: Response) {
+    try {
+      const { description } = req.body;
+
+      if (!description) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Description is required' 
+        });
+      }
+
+      const generatedRFP = await aiService.generateRFP(description);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          ...generatedRFP,
+          description
+        }
+      });
+    } catch (error) {
+      logger.error('Error in generateRFP:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to generate RFP' 
+      });
+    }
+  }
+
+  //CREATE RFP
+
+    async createRFP(req: Request, res: Response) {
+    try {
+      const rfp = new rfpModel(req.body);
+      await rfp.save();
+
+      logger.info(`RFP created: ${rfp._id}`);
+      res.status(201).json({
+        success: true,
+        data: rfp
+      });
+    } catch (error) {
+      logger.error('Error in createRFP:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to create RFP' 
+      });
+    }
+  }
+
+  // GET All RFPs
+    async getAllRFPs(req: Request, res: Response) {
+    try {
+      const { status } = req.query;
+      
+      const filter: any = {};
+      if (status) {
+        filter.status = status;
+      }
+
+      const rfps = await rfpModel.find(filter)
+        .sort({ createdAt: -1 });
+
+      res.status(200).json({
+        success: true,
+        count: rfps.length,
+        data: rfps
+      });
+    } catch (error) {
+      logger.error('Error in getAllRFPs:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to fetch RFPs' 
+      });
+    }
+  }
+
+  //GET RFPs BY ID
+  async getRFPById(req: Request, res: Response) {
+    try {
+      const rfp = await rfpModel.findById(req.params.id)
+
+      if (!rfp) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'RFP not found' 
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: rfp
+      });
+    } catch (error) {
+      logger.error('Error in getRFPById:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to fetch RFP' 
+      });
+    }
+  }
+
+  //UPDATE RFPs BY ID
+  async updateRFP(req: Request, res: Response) {
+    try {
+      const rfp = await rfpModel.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true, runValidators: true }
+      );
+
+      if (!rfp) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'RFP not found' 
+        });
+      }
+
+      logger.info(`RFP updated: ${rfp._id}`);
+      res.status(200).json({
+        success: true,
+        data: rfp
+      });
+    } catch (error) {
+      logger.error('Error in updateRFP:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to update RFP' 
+      });
+    }
+  }
+
+  //DELETE RFPs By ID
+    async deleteRFP(req: Request, res: Response) {
+    try {
+      const rfp = await rfpModel.findByIdAndDelete(req.params.id);
+
+      if (!rfp) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'RFP not found' 
+        });
+      }
+
+      logger.info(`RFP deleted: ${req.params.id}`);
+      res.status(200).json({
+        success: true,
+        message: 'RFP deleted successfully'
+      });
+    } catch (error) {
+      logger.error('Error in deleteRFP:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to delete RFP' 
+      });
+    }
+  }
+
+  //Get dashboard stats
+  async getDashboardStats(req: Request, res: Response) {
+    try {
+      const totalRFPs = await rfpModel.countDocuments();
+      const draftRFPs = await rfpModel.countDocuments({ status: 'draft' });
+      const sentRFPs = await rfpModel.countDocuments({ status: 'sent' });
+      const responsesRFPs = await rfpModel.countDocuments({ status: 'responses' });
+      const evaluatedRFPs = await rfpModel.countDocuments({ status: 'evaluated' });
+
+      res.status(200).json({
+        success: true,
+        data: {
+          total: totalRFPs,
+          draft: draftRFPs,
+          sent: sentRFPs,
+          responses: responsesRFPs,
+          evaluated: evaluatedRFPs
+        }
+      });
+    } catch (error) {
+      logger.error('Error in getDashboardStats:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to fetch dashboard stats' 
+      });
+    }
+  }
+
+}
+
+export default new RFPController();
