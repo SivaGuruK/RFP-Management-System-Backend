@@ -48,3 +48,24 @@ export interface IEmail extends Document {
   sentAt?: Date;
   createdAt: Date;
 }
+
+export interface IProposal extends Document {
+  _id: Types.ObjectId;
+  rfpId: Types.ObjectId;
+  vendorId: Types.ObjectId;
+  price: number;
+  deliveryTime: string;
+  warranty: string;
+  terms?: string;
+  parsedData?: any;
+  aiScore?: number;
+  aiAnalysis?: {
+    strengths: string[];
+    weaknesses: string[];
+    recommendation: string;
+  };
+  status: 'received' | 'parsed' | 'evaluated';
+  receivedDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
