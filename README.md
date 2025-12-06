@@ -153,5 +153,3 @@ npm start
 ## 9. License
 This project is for evaluation purposes only.
 
-## 10. License  
-This project is for educational and evaluation purposes only.
