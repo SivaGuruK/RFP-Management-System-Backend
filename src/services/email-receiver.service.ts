@@ -2,6 +2,7 @@ import Imap from 'imap';
 import { simpleParser } from 'mailparser';
 import logger from '@/utils/logger';
 import parserService from './parser.service';
+import EmailModel from '@/models/Email.model';
 
 class EmailReceiverService {
   private imap: Imap | null = null;
@@ -215,6 +216,16 @@ class EmailReceiverService {
       
       if (emailDate < cutoffDate) {
         logger.debug(`Skipping email from before Dec 5, 2025: ${emailData.subject}`);
+        return;
+      }
+      const existingEmail = await EmailModel.findOne({ 
+        from: emailData.from,
+        subject: emailData.subject,
+        receivedAt: emailData.receivedAt 
+      });
+      
+      if (existingEmail) {
+        logger.debug('Email already in DB, skipping');
         return;
       }
 
